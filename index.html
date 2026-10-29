@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新加坡・西澳・墨爾本14天夢幻陽光之旅</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 40%, #e0f2fe 100%);
+            min-height: 100vh;
+            color: #1e293b;
+        }
+        .sun-card {
+            background: rgba(255, 255, 255, 0.90);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(251, 191, 36, 0.35);
+            box-shadow: 0 12px 30px -10px rgba(245, 158, 11, 0.15);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .sun-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 35px -10px rgba(245, 158, 11, 0.25);
+        }
+        /* 自訂隱藏捲軸但保持順暢 */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="pb-20">
+
+    <!-- 頂部 Hero Banner -->
+    <header class="relative overflow-hidden bg-gradient-to-r from-amber-500 via-orange-500 to-sky-500 text-white shadow-xl rounded-b-[2.5rem] pt-8 pb-10 px-4">
+        <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/20 rounded-full blur-2xl pointer-events-none"></div>
+        <div class="max-w-md mx-auto text-center relative z-10">
+            <span class="inline-block bg-white/25 text-yellow-100 text-xs font-black px-3.5 py-1 rounded-full uppercase tracking-widest mb-3 backdrop-blur-md shadow-inner">
+                🌴 14 Days Ultimate Sun Trip
+            </span>
+            <h1 class="text-3xl sm:text-4xl font-black tracking-tight mb-2 drop-shadow-md">
+                新加坡・西澳・墨爾本
+            </h1>
+            <p class="text-yellow-50 text-sm font-medium opacity-95">自然與城市的完美交響曲 ☀️✨</p>
+        </div>
+    </header>
+
+    <!-- 置頂懸浮篩選導航列 (Sticky Navigation) -->
+    <nav class="sticky top-0 z-40 bg-white/85 backdrop-blur-md border-b border-amber-200/60 shadow-sm py-3 px-4 mb-4">
+        <div class="max-w-md mx-auto flex gap-2 overflow-x-auto no-scrollbar">
+            <button onclick="filterDestination('all', this)" class="filter-btn flex-none px-4 py-2 rounded-full text-xs font-black bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md transition-all scale-105">全部 14 天</button>
+            <button onclick="filterDestination('sg', this)" class="filter-btn flex-none px-4 py-2 rounded-full text-xs font-bold bg-white text-slate-700 border border-amber-200 shadow-sm hover:bg-amber-50 transition-all">🇸🇬 新加坡 (D1)</button>
+            <button onclick="filterDestination('wa', this)" class="filter-btn flex-none px-4 py-2 rounded-full text-xs font-bold bg-white text-slate-700 border border-amber-200 shadow-sm hover:bg-amber-50 transition-all">🇦🇺 西澳 (D2-D10)</button>
+            <button onclick="filterDestination('mel', this)" class="filter-btn flex-none px-4 py-2 rounded-full text-xs font-bold bg-white text-slate-700 border border-amber-200 shadow-sm hover:bg-amber-50 transition-all">🇦🇺 墨爾本 (D11-D14)</button>
+        </div>
+    </nav>
+
+    <!-- 主要內容區 -->
+    <main class="max-w-md mx-auto px-4 space-y-4" id="itinerary-list">
+        <!-- 程式動態載入 -->
+    </main>
+
+    <!-- 詳細行程彈出視窗 (Modal) -->
+    <div id="detail-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all opacity-0">
+        <div class="bg-white w-full sm:max-w-lg max-h-[90vh] sm:rounded-3xl rounded-t-3xl shadow-2xl flex flex-col overflow-hidden transform translate-y-full sm:translate-y-0 transition-transform duration-300" id="modal-content-box">
+            
+            <!-- Modal 頂部 Header 附背景圖 -->
+            <div id="modal-header" class="relative p-6 text-white bg-cover bg-center flex-none overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/40 to-transparent"></div>
+                <button onclick="closeModal()" class="absolute top-4 right-4 z-10 w-9 h-9 bg-black/40 hover:bg-black/60 rounded-full flex items-center justify-center text-white text-lg font-bold backdrop-blur-md transition-colors">
+                    ✕
+                </button>
+                <div class="relative z-10">
+                    <span id="modal-day-badge" class="inline-block bg-amber-500/90 text-white text-xs font-black px-2.5 py-1 rounded-full mb-2 shadow-sm">DAY 1</span>
+                    <h2 id="modal-title" class="text-xl sm:text-2xl font-black leading-tight drop-shadow-md">行程標題</h2>
+                    <p id="modal-hotel" class="text-xs text-amber-200 font-semibold mt-1 drop-shadow">🏨 酒店資訊</p>
+                </div>
+            </div>
+
+            <!-- Modal 內容列表 (可滾動) -->
+            <div id="modal-body" class="p-5 overflow-y-auto space-y-4 divide-y divide-orange-100 flex-1">
+                <!-- 動態注入詳細時間軸 -->
+            </div>
+
+            <!-- Modal 底部關閉按鈕 -->
+            <div class="p-4 bg-slate-50 border-t border-slate-100 flex-none text-center">
+                <button onclick="closeModal()" class="w-full py-3 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold rounded-2xl shadow-md transition-all text-sm">
+                    關閉檢視
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 行程完整資料庫連帶高畫質風景圖片
+        const tripData = [
+            {
+                day: 1, date: "10月31日", region: "sg", title: "新加坡「午餐雞飯×歷史街區×超級樹燈光秀」", hotel: "MERCURE ICON SINGAPORE",
+                image: "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=800&q=80",
+                summary: "抵達新加坡樟宜機場，直奔牛車水放行李，品嚐天天海南雞飯，午後聖淘沙 Skyline Luge 滑車，晚上魚尾獅公園與濱海灣花園超級樹燈光秀。",
+                details: [
+                    { time: "13:05-14:15", title: "抵達新加坡與快速通關", desc: "飛機降落樟宜機場。通過自動通關、拿完行李後，建議直接搭乘 Grab 直奔位於牛車水的飯店（車程約25分鐘）[cite: 1, 2]。" },
+                    { time: "14:15-14:45", title: "飯店 Check-in & 放下行李", desc: "將行李寄放在飯店，換上初夏輕便服裝[cite: 2]。" },
+                    { time: "14:45-16:00", title: "午餐首站：朝聖【天天海南雞飯】", desc: "直接步行前往麥士威熟食中心 (Maxwell Food Centre) 的天天海南雞飯。必點香氣濃富的雞油飯搭配極其滑嫩的白斬雞[cite: 2]。" },
+                    { time: "16:00-17:00", title: "前往聖淘沙 Skyline Luge", desc: "進入 VivoCity（怡豐城）3樓，乘搭 Sentosa Express 坐到 Imbiah Station 下車，步行即達 Skyline Luge 入口[cite: 2]。" },
+                    { time: "17:00-19:00", title: "刺激體驗：Skyline Luge 斜坡滑車", desc: "先乘搭吊椅（Skyride）上山俯瞰聖淘沙海景，然後駕駛斜坡滑車沿著特製跑道衝刺下山[cite: 2]。" },
+                    { time: "19:00-19:45", title: "聖淘沙 → 直達魚尾獅公園", desc: "從聖淘沙海灘站搭捷運回到 VivoCity，再叫 Grab 直達魚尾獅公園[cite: 2]。" },
+                    { time: "20:35-21:10", title: "壓軸：超級樹魔幻燈光秀 (Garden Rhapsody)", desc: "準時觀賞免費音樂燈光秀，高聳巨樹隨著音樂變幻光影，視覺震撼感極強[cite: 2]。" }
+                ]
+            },
+            {
+                day: 2, date: "11月1日", region: "wa", title: "飛向西澳×古城週日集市×圓房落日", hotel: "ESPLANADE HOTEL FREMANTLE",
+                image: "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=800&q=80",
+                summary: "搭乘新航 SQ223 飛往珀斯，直奔弗里曼特爾，趕上百年週日市集，漫步圓房欣賞印度洋粉金落日。",
+                details: [
+                    { time: "09:30-14:40", title: "新航 SQ223 飛行時間", desc: "由新加坡樟宜機場出發飛往珀斯，飛行時間約5小時10分鐘[cite: 3]。" },
+                    { time: "15:40-16:30", title: "機場接駁前往弗里曼特爾", desc: "建議直接使用 Uber 直奔 Fremantle（車程約40分鐘）[cite: 3]。" },
+                    { time: "17:15-18:00", title: "快閃趕上 Fremantle Markets", desc: "歷史超過120年的古蹟市集，週末限定。欣賞街頭藝人表演與手工伴手禮[cite: 3]。" },
+                    { time: "18:00-18:45", title: "圓房落日漫步", desc: "散步前往西澳最古老的建築 The Round House，俯瞰 Bathers Beach 捕捉夕陽[cite: 3]。" },
+                    { time: "18:45-20:30", title: "漁人碼頭炸魚薯條晚餐", desc: "漫步至碼頭老字號餐廳 Cicerello's 或 Kailis' 品嚐炸魚薯條[cite: 3]。" }
+                ]
+            },
+            {
+                day: 3, date: "11月2日", region: "wa", title: "登島單車環島×邂逅 Quokka 短尾矮袋鼠", hotel: "Stay Rottnest (小木屋)",
+                image: "https://images.unsplash.com/photo-1529367071555-d3e26cb3b9a0?auto=format&fit=crop&w=800&q=80",
+                summary: "乘渡輪前往羅特尼斯島，租單車暢騎地中海泳池 The Basin 與粉紅湖，黃昏與萌爆的 Quokka 自拍。",
+                details: [
+                    { time: "08:30-09:00", title: "渡輪橫渡", desc: "搭乘渡輪前往羅特尼斯島，船程約30分鐘[cite: 4]。" },
+                    { time: "09:45-12:30", title: "前半段單車環島（北部與中部）", desc: "騎單車造訪 The Basin 海濱泳池以及穿越島中央夢幻粉紅湖[cite: 4]。" },
+                    { time: "17:00-18:30", title: "黃昏 Quokka 自拍黃金時間", desc: "傍晚氣溫轉涼，成群可愛的短尾矮袋鼠出沒，自拍最佳時機！[cite: 4]" }
+                ]
+            },
+            {
+                day: 4, date: "11月3日", region: "wa", title: "隱世海崖單車×渡假風午餐", hotel: "ESPLANADE HOTEL FREMANTLE",
+                image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
+                summary: "清晨無人沙灘散步，登燈塔看驚濤駭浪與野生海獅，午後品嚐柴燒披薩返回弗里曼特爾。",
+                details: [
+                    { time: "09:30-11:30", title: "最西端壯麗探險", desc: "騎車上坡前往 Wadjemup Lighthouse 俯瞰全景，或到 Cape Vlamingh 看海獅[cite: 5]。" },
+                    { time: "13:00-14:30", title: "渡假風悠閒午餐", desc: "在 Frankies on Rotto 享用柴燒手工薄皮披薩與肉醬義大利麵[cite: 5]。" }
+                ]
+            },
+            {
+                day: 5, date: "11月4日", region: "wa", title: "班伯利自駕飛行×棧橋日落", hotel: "BUSSELTON ITHACA MOTEL",
+                image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80",
+                summary: "展開自駕之旅，親自駕駛飛機飛上高空俯瞰海岸線，乘坐海上紅色小火車穿過巴瑟爾頓棧橋。",
+                details: [
+                    { time: "13:00-14:30", title: "班伯利機場自駕飛行", desc: "親自掌控操縱桿飛上高空，俯瞰蔚藍海岸線 (Trial Instructional Flight)[cite: 6]。" },
+                    { time: "15:15-18:30", title: "巴瑟爾頓棧橋與海底觀測站", desc: "乘搭紅色小火車穿越1.8公里木棧橋，深入水下8米觀賞海洋生物[cite: 6]。" }
+                ]
+            },
+            {
+                day: 6, date: "11月5日", region: "wa", title: "隱世水療×黑沙灘×親手抱樹熊", hotel: "GREAT SOUTHERN HOTEL PERTH",
+                image: "https://images.unsplash.com/photo-1534567153574-2b12153a87f0?auto=format&fit=crop&w=800&q=80",
+                summary: "造訪天然岩池 Injidup Natural Spa，觀賞火山玄武岩黑沙灘，前往 Cohunu Koala Park 抱樹熊。",
+                details: [
+                    { time: "09:00-11:00", title: "亞林加普 Injidup Natural Spa", desc: "在大自然按摩浴缸的天然岩池裡泡水拍照，享受海浪沖刷岩石的壯觀瀑布[cite: 7]。" },
+                    { time: "15:15-16:40", title: "Cohunu Koala Park 抱樹熊", desc: "親手抱樹熊感受療癒感並合照，手餵袋鼠、鴯鶓[cite: 7]。" }
+                ]
+            },
+            {
+                day: 7, date: "11月6日", region: "wa", title: "尖峰石陣×朱里恩灣極限高空跳傘", hotel: "PELICAN'S NEST",
+                image: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=800&q=80",
+                summary: "探索南邦國家公園尖峰石陣，龍蝦工廠品嚐岩龍蝦，挑戰 15,000 呎高空跳傘。",
+                details: [
+                    { time: "09:30-11:00", title: "參觀尖峰石陣 (The Pinnacles)", desc: "欣賞壯觀奇特的石灰岩柱群[cite: 8]。" },
+                    { time: "13:30-15:30", title: "朱里恩灣極限高空跳傘", desc: "從 10,000 至 15,000 英尺高空一躍而下，極致刺激[cite: 8]。" }
+                ]
+            },
+            {
+                day: 8, date: "11月7日", region: "wa", title: "內陸峽谷天空步道×潟湖浮潛×紅崖日落", hotel: "PELICAN'S NEST",
+                image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=80",
+                summary: "懸空俯瞰卡爾巴里天空步道與大自然之窗，午後於 Blue Holes 天然潟湖浮潛。",
+                details: [
+                    { time: "08:00-11:30", title: "卡爾巴里國家公園內陸區", desc: "前往天空步道懸空俯瞰峽谷，在大自然之窗拍攝經典岩石畫框照[cite: 9]。" },
+                    { time: "13:30-15:30", title: "Blue Holes 天然潟湖浮潛", desc: "海水清澈見底，在礁石縫隙中觀賞彩色珊瑚與熱帶魚[cite: 9]。" }
+                ]
+            },
+            {
+                day: 9, date: "11月8日", region: "wa", title: "夢幻芭比粉紅湖×蘭斯林白沙丘滑沙", hotel: "IBIS PERTH",
+                image: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?auto=format&fit=crop&w=800&q=80",
+                summary: "朝聖赫特潟湖夢幻粉紅湖，挑戰蘭斯林白沙丘滑沙，傍晚返回珀斯還車。",
+                details: [
+                    { time: "08:45-09:45", title: "赫特潟湖 (Pink Lake)", desc: "陽光角度讓湖水呈現最飽滿夢幻的芭比粉紅色[cite: 10]。" },
+                    { time: "15:30-16:30", title: "蘭斯林白沙丘滑沙", desc: "租借滑沙板爬上巨大純白沙丘俯衝而下[cite: 10]。" }
+                ]
+            },
+            {
+                day: 10, date: "11月9日", region: "wa", title: "伯斯市區精華免自駕一日遊", hotel: "IBIS PERTH",
+                image: "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=800&q=80",
+                summary: "乘搭綠貓公車遊覽國王公園、倫敦閣、伊麗莎白碼頭午餐、藍色船屋。",
+                details: [
+                    { time: "09:00-11:00", title: "國王公園 (Kings Park)", desc: "乘搭綠貓公車欣賞全景[cite: 11]。" },
+                    { time: "14:30-15:45", title: "藍色船屋 (Blue Boat House)", desc: "打卡西澳極具代表性的網紅景點[cite: 11]。" }
+                ]
+            },
+            {
+                day: 11, date: "11月10日", region: "mel", title: "飛抵墨爾本·午後文藝漫步×亞拉河畔", hotel: "CAUSEWAY 353 HOTEL",
+                image: "https://images.unsplash.com/photo-1514395462725-fb4566210144?auto=format&fit=crop&w=800&q=80",
+                summary: "搭乘航班飛往墨爾本，入住市區後品嚐意式午餐，參觀 NGV 美術館，晚上亞拉河畔享用摩登澳洲菜。",
+                details: [
+                    { time: "06:00-11:35", title: "飛往墨爾本", desc: "乘搭 VA678 航班，航程約3.5小時[cite: 12]。" },
+                    { time: "18:30", title: "亞拉河畔南岸晚餐", desc: "在南岸景觀餐廳享用摩登澳洲菜與紅酒[cite: 12]。" }
+                ]
+            },
+            {
+                day: 12, date: "11月11日", region: "mel", title: "丹頓農山脈百年蒸汽小火車之旅", hotel: "CAUSEWAY 353 HOTEL",
+                image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=800&q=80",
+                summary: "搭乘 Puffing Billy 蒸汽火車，雙腳盪在車窗外穿梭蕨類雨林，午後漫步霍西爾巷塗鴉牆。",
+                details: [
+                    { time: "11:00-12:00", title: "蒸汽小火車體驗", desc: "坐在火車窗框上，雙腳盪在外面，穿梭在經典高架橋與巨型蕨類樹林中[cite: 13]。" },
+                    { time: "16:30-18:30", title: "市區探索", desc: "逛逛墨爾本著名的網紅塗鴉牆霍西爾巷[cite: 13]。" }
+                ]
+            },
+            {
+                day: 13, date: "11月12日", region: "mel", title: "QVM 美食早市×彩虹小屋×企鵝歸巢", hotel: "CAUSEWAY 353 HOTEL",
+                image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
+                summary: "女王市場品嚐甜甜圈與生蠔，布萊頓海灘彩色小屋打卡，傍晚前往菲利普島觀賞企鵝歸巢。",
+                details: [
+                    { time: "10:00-12:00", title: "維多利亞女王市場 (QVM) Brunch", desc: "掃街品嚐甜甜圈、拿鐵、土耳其餡餅與新鮮生蠔[cite: 14]。" },
+                    { time: "19:30-21:15", title: "Penguin Plus 企鵝歸巢體驗", desc: "觀看成群結隊的小企鵝超近距離搖擺經過[cite: 14]。" }
+                ]
+            },
+            {
+                day: 14, date: "11月13日", region: "mel", title: "國泰商務艙奢華返港", hotel: "甜蜜溫馨的家",
+                image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=800&q=80",
+                summary: "享受墨爾本機場貴賓室，搭乘國泰航空 CX134 商務艙直飛香港，完美結束14天旅程。",
+                details: [
+                    { time: "05:00", title: "前往機場與貴賓室早餐", desc: "進入國泰合作貴賓室享用現點現做澳式熱早餐[cite: 1]。" },
+                    { time: "07:25", title: "搭乘國泰航空 CX134 商務艙返港", desc: "在萬呎高空享用商務艙多道菜式午餐與美酒降落香港[cite: 1]。" }
+                ]
+            }
+        ];
+
+        // 渲染主畫面列表
+        function renderItinerary(filter = 'all') {
+            const listEl = document.getElementById('itinerary-list');
+            listEl.innerHTML = '';
+
+            const filtered = filter === 'all' ? tripData : tripData.filter(item => item.region === filter);
+
+            filtered.forEach(item => {
+                let regionBadgeColor = 'bg-amber-100 text-amber-800 border border-amber-300';
+                let regionName = '新加坡';
+                if(item.region === 'wa') { regionBadgeColor = 'bg-orange-100 text-orange-800 border border-orange-300'; regionName = '西澳'; }
+                if(item.region === 'mel') { regionBadgeColor = 'bg-sky-100 text-sky-800 border border-sky-300'; regionName = '墨爾本'; }
+
+                const card = document.createElement('div');
+                card.className = 'sun-card rounded-2xl overflow-hidden cursor-pointer';
+                card.onclick = () => openModal(item.day);
+                card.innerHTML = `
+                    <div class="relative h-36 w-full overflow-hidden">
+                        <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-transparent to-transparent"></div>
+                        <div class="absolute top-3 left-3 flex gap-2">
+                            <span class="bg-gradient-to-r from-orange-500 to-amber-500 text-white text-xs font-black px-3 py-1 rounded-full shadow-md">
+                                DAY ${item.day} · ${item.date}
+                            </span>
+                        </div>
+                        <div class="absolute top-3 right-3">
+                            <span class="text-xs font-bold px-2.5 py-1 rounded-full ${regionBadgeColor} backdrop-blur-md shadow-sm">
+                                ${regionName}
+                            </span>
+                        </div>
+                        <div class="absolute bottom-3 left-3 right-3 text-white">
+                            <h3 class="text-sm sm:text-base font-extrabold leading-snug drop-shadow-md line-clamp-1">
+                                ${item.title}
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-xs text-slate-600 line-clamp-2 mb-3 leading-relaxed">
+                            ${item.summary}
+                        </p>
+                        <div class="flex items-center justify-between pt-2 border-t border-amber-100 text-xs">
+                            <span class="text-slate-600 font-semibold truncate max-w-[210px]">🏨 ${item.hotel}</span>
+                            <span class="text-orange-600 font-bold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                                查看詳細行程 →
+                            </span>
+                        </div>
+                    </div>
+                `;
+                listEl.appendChild(card);
+            });
+        }
+
+        // 地區篩選切換
+        function filterDestination(region, btnElement) {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.className = 'filter-btn flex-none px-4 py-2 rounded-full text-xs font-bold bg-white text-slate-700 border border-amber-200 shadow-sm hover:bg-amber-50 transition-all';
+            });
+            btnElement.className = 'filter-btn flex-none px-4 py-2 rounded-full text-xs font-black bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md transition-all scale-105';
+            
+            renderItinerary(region);
+        }
+
+        // 開啟詳細 Modal
+        function openModal(dayNum) {
+            const data = tripData.find(d => d.day === dayNum);
+            if (!data) return;
+
+            document.getElementById('modal-day-badge').innerText = `DAY ${data.day} · ${data.date}`;
+            document.getElementById('modal-title').innerText = data.title;
+            document.getElementById('modal-hotel').innerText = `🏨 今日住宿：${data.hotel}`;
+            
+            // 設定 Modal Header 背景圖片
+            const headerEl = document.getElementById('modal-header');
+            headerEl.style.backgroundImage = `url('${data.image}')`;
+            headerEl.style.height = '140px';
+
+            const bodyEl = document.getElementById('modal-body');
+            bodyEl.innerHTML = '';
+
+            data.details.forEach(detail => {
+                const row = document.createElement('div');
+                row.className = 'pt-3 first:pt-0';
+                row.innerHTML = `
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="bg-amber-100 text-amber-900 text-[11px] font-black px-2.5 py-0.5 rounded-md shadow-2xs">
+                            ⏱ ${detail.time}
+                        </span>
+                        <h4 class="text-sm font-bold text-slate-800">${detail.title}</h4>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed pl-1">
+                        ${detail.desc}
+                    </p>
+                `;
+                bodyEl.appendChild(row);
+            });
+
+            const modal = document.getElementById('detail-modal');
+            const box = document.getElementById('modal-content-box');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                box.classList.remove('translate-y-full');
+            }, 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        // 關閉 Modal
+        function closeModal() {
+            const modal = document.getElementById('detail-modal');
+            const box = document.getElementById('modal-content-box');
+            modal.classList.add('opacity-0');
+            box.classList.add('translate-y-full');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+
+        // 點擊背景關閉
+        document.getElementById('detail-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'detail-modal') closeModal();
+        });
+
+        // 初始化載入全部
+        renderItinerary('all');
+    </script>
+</body>
+</html>
