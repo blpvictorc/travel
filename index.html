@@ -64,7 +64,7 @@
         <!-- 程式動態載入 -->
     </main>
 
-    <!-- 詳細行程彈出視窗 (Modal)連帶全新手機友善編輯區 -->
+    <!-- 詳細行程彈出視窗 (Modal) -->
     <div id="detail-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all opacity-0">
         <div class="bg-white w-full sm:max-w-lg max-h-[92vh] sm:rounded-3xl rounded-t-3xl shadow-2xl flex flex-col overflow-hidden transform translate-y-full sm:translate-y-0 transition-transform duration-300" id="modal-content-box">
             
@@ -81,12 +81,12 @@
                 </div>
             </div>
 
-            <!-- Modal 內容列表 (手機超易禁嘅卡片式編輯) -->
+            <!-- Modal 內容列表 -->
             <div id="modal-body" class="p-4 overflow-y-auto space-y-3 flex-1 bg-slate-50">
                 <!-- 動態注入行程卡片 -->
             </div>
 
-            <!-- 底部功能按鈕區 (新增行程 + 還原預設) -->
+            <!-- 底部功能按鈕區 -->
             <div class="p-3 bg-white border-t border-slate-200 flex gap-2 flex-none">
                 <button onclick="openAddItemModal()" class="flex-1 py-3 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold rounded-xl shadow-md text-xs transition-all flex items-center justify-center gap-1">
                     ➕ 新增行程項目
@@ -96,7 +96,6 @@
                 </button>
             </div>
 
-            <!-- 關閉按鈕 -->
             <div class="p-3 bg-slate-100 border-t border-slate-200 flex-none text-center">
                 <button onclick="closeModal()" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-sm transition-all text-xs">
                     完成並關閉
@@ -110,7 +109,7 @@
         <div class="bg-white w-full max-w-sm rounded-2xl p-5 shadow-2xl space-y-3">
             <h3 id="item-modal-title" class="font-extrabold text-slate-800 text-base">新增行程</h3>
             <div>
-                <label class="text-xs font-bold text-slate-600">時間區段</label>
+                <label class="text-xs font-bold text-slate-600">時間區段 (例如: 14:00-15:30)</label>
                 <input type="text" id="edit-time" class="w-full mt-1 px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold text-amber-800" placeholder="例如: 14:00-15:30">
             </div>
             <div>
@@ -187,7 +186,7 @@
             },
             {
                 day: 6, date: "11月5日", region: "wa", title: "隱世水療×黑沙灘×親手抱樹熊", hotel: "GREAT SOUTHERN HOTEL PERTH",
-                image: "https://img.myshopline.com/image/store/1756376570606/IMG-4768_1800x.heic?w=2426&h=2426&q=80",
+                image: "https://img.myshopline.com/image/store/1756376570606/IMG-47502.heic?w=2717&h=2717",
                 summary: "造訪天然岩池 Injidup Natural Spa[cite: 7]，觀賞火山玄武岩黑沙灘[cite: 7]，前往 Cohunu Koala Park 抱樹熊[cite: 7]。",
                 details: [
                     { time: "09:00-11:00", title: "亞林加普 Injidup Natural Spa", desc: "在大自然按摩浴缸的天然岩池裡泡水拍照，享受海浪沖刷岩石的壯觀瀑布[cite: 7]。" },
@@ -347,6 +346,9 @@
             const headerEl = document.getElementById('modal-header');
             headerEl.style.backgroundImage = `url('${data.image}')`;
 
+            // 開啟時先自動按時間排序一次
+            sortDetailsByTime(data);
+
             renderModalBody(data);
 
             const modal = document.getElementById('detail-modal');
@@ -357,6 +359,18 @@
                 box.classList.remove('translate-y-full');
             }, 10);
             document.body.style.overflow = 'hidden';
+        }
+
+        // 核心功能：依據時間自動排序 details 陣列
+        function sortDetailsByTime(data) {
+            data.details.sort((a, b) => {
+                // 提取時間字串中第一個出現的四位數時間（例如 "13:05-14:15" 提取出 "13:05"）
+                const getTimeVal = (str) => {
+                    const match = str.match(/\d{2}:\d{2}/);
+                    return match ? match[0] : "99:99"; // 沒有時間的排到最後
+                };
+                return getTimeVal(a.time).localeCompare(getTimeVal(b.time));
+            });
         }
 
         // 渲染 Modal 內部手機友善卡片
@@ -439,7 +453,7 @@
             document.getElementById('add-item-modal').classList.add('hidden');
         }
 
-        // 儲存項目 (新增或修改)
+        // 儲存項目 (新增或修改) -> 自動重新按時間排序！
         function saveItemModal() {
             const time = document.getElementById('edit-time').value.trim() || "全天";
             const title = document.getElementById('edit-title').value.trim() || "未命名行程";
@@ -452,6 +466,10 @@
                 } else {
                     data.details[editingItemIndex] = { time, title, desc };
                 }
+                
+                // 每次新增或修改後，自動按時間排序！
+                sortDetailsByTime(data);
+
                 saveData();
                 renderModalBody(data);
             }
@@ -465,6 +483,7 @@
                 const current = tripData.find(d => d.day === currentEditingDay);
                 if(def && current) {
                     current.details = JSON.parse(JSON.stringify(def.details));
+                    sortDetailsByTime(current);
                     saveData();
                     renderModalBody(current);
                 }
