@@ -64,7 +64,7 @@
         <!-- 程式動態載入 -->
     </main>
 
-    <!-- 詳細行程彈出視窗 (Modal) -->
+    <!-- 詳細行程彈出視窗 (Modal)連帶編輯功能 -->
     <div id="detail-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all opacity-0">
         <div class="bg-white w-full sm:max-w-lg max-h-[90vh] sm:rounded-3xl rounded-t-3xl shadow-2xl flex flex-col overflow-hidden transform translate-y-full sm:translate-y-0 transition-transform duration-300" id="modal-content-box">
             
@@ -81,23 +81,53 @@
                 </div>
             </div>
 
-            <!-- Modal 內容列表 (可滾動) -->
+            <!-- Modal 內容列表 (可滾動及編輯) -->
             <div id="modal-body" class="p-5 overflow-y-auto space-y-4 divide-y divide-orange-100 flex-1">
-                <!-- 動態注入詳細時間軸 -->
+                <!-- 動態注入可編輯的時間軸項目 -->
+            </div>
+
+            <!-- 新增行程按鈕區 -->
+            <div class="p-3 bg-amber-50 border-t border-amber-200 flex-none">
+                <button onclick="openAddItemModal()" class="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl shadow-sm text-xs transition-all flex items-center justify-center gap-1">
+                    ➕ 在此日新增行程項目
+                </button>
             </div>
 
             <!-- Modal 底部關閉按鈕 -->
             <div class="p-4 bg-slate-50 border-t border-slate-100 flex-none text-center">
                 <button onclick="closeModal()" class="w-full py-3 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold rounded-2xl shadow-md transition-all text-sm">
-                    關閉檢視
+                    儲存並關閉檢視
                 </button>
             </div>
         </div>
     </div>
 
+    <!-- 新增行程小視窗 -->
+    <div id="add-item-modal" class="fixed inset-0 z-65 bg-slate-900/50 backdrop-blur-xs hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-2xl p-5 shadow-2xl space-y-3">
+            <h3 class="font-extrabold text-slate-800 text-base">新增行程細節</h3>
+            <div>
+                <label class="text-xs font-bold text-slate-600">時間 (例如: 14:30-15:30)</label>
+                <input type="text" id="new-time" class="w-full mt-1 px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500" placeholder="14:30-15:30">
+            </div>
+            <div>
+                <label class="text-xs font-bold text-slate-600">行程標題</label>
+                <input type="text" id="new-title" class="w-full mt-1 px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500" placeholder="例如：品嚐下午茶">
+            </div>
+            <div>
+                <label class="text-xs font-bold text-slate-600">詳細描述</label>
+                <textarea id="new-desc" class="w-full mt-1 px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500" rows="3" placeholder="輸入詳細內容..."></textarea>
+            </div>
+            <div class="flex gap-2 pt-2">
+                <button onclick="closeAddItemModal()" class="flex-1 py-2 bg-slate-200 text-slate-700 text-xs font-bold rounded-xl">取消</button>
+                <button onclick="confirmAddItem()" class="flex-1 py-2 bg-amber-500 text-white text-xs font-bold rounded-xl shadow-md">確認新增</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // 行程完整資料庫連帶優質穩定圖片
-        const tripData = [
+        // 初始完整資料庫（支援 LocalStorage 讀取修改）
+        const defaultTripData = [
             {
                 day: 1, date: "10月31日", region: "sg", title: "新加坡「午餐雞飯×歷史街區×超級樹燈光秀」", hotel: "MERCURE ICON SINGAPORE",
                 image: "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=800&q=80",
@@ -235,6 +265,10 @@
             }
         ];
 
+        // 讀取儲存或預設資料
+        let tripData = JSON.parse(localStorage.getItem('my_trip_data')) || defaultTripData;
+        let currentEditingDay = null;
+
         // 渲染主畫面列表
         function renderItinerary(filter = 'all') {
             const listEl = document.getElementById('itinerary-list');
@@ -278,7 +312,7 @@
                         <div class="flex items-center justify-between pt-2 border-t border-amber-100 text-xs">
                             <span class="text-slate-600 font-semibold truncate max-w-[210px]">🏨 ${item.hotel}</span>
                             <span class="text-orange-600 font-bold flex items-center gap-1">
-                                查看詳細行程 →
+                                編輯與查看詳細 →
                             </span>
                         </div>
                     </div>
@@ -299,6 +333,7 @@
 
         // 開啟詳細 Modal
         function openModal(dayNum) {
+            currentEditingDay = dayNum;
             const data = tripData.find(d => d.day === dayNum);
             if (!data) return;
 
@@ -309,25 +344,7 @@
             const headerEl = document.getElementById('modal-header');
             headerEl.style.backgroundImage = `url('${data.image}')`;
 
-            const bodyEl = document.getElementById('modal-body');
-            bodyEl.innerHTML = '';
-
-            data.details.forEach(detail => {
-                const row = document.createElement('div');
-                row.className = 'pt-3 first:pt-0';
-                row.innerHTML = `
-                    <div class="flex items-center gap-2 mb-1">
-                        <span class="bg-amber-100 text-amber-900 text-[11px] font-black px-2.5 py-0.5 rounded-md shadow-2xs">
-                            ⏱ ${detail.time}
-                        </span>
-                        <h4 class="text-sm font-bold text-slate-800">${detail.title}</h4>
-                    </div>
-                    <p class="text-xs text-slate-600 leading-relaxed pl-1">
-                        ${detail.desc}
-                    </p>
-                `;
-                bodyEl.appendChild(row);
-            });
+            renderModalBody(data);
 
             const modal = document.getElementById('detail-modal');
             const box = document.getElementById('modal-content-box');
@@ -337,6 +354,98 @@
                 box.classList.remove('translate-y-full');
             }, 10);
             document.body.style.overflow = 'hidden';
+        }
+
+        // 渲染 Modal 內部可編輯項目
+        function renderModalBody(data) {
+            const bodyEl = document.getElementById('modal-body');
+            bodyEl.innerHTML = '';
+
+            data.details.forEach((detail, index) => {
+                const row = document.createElement('div');
+                row.className = 'pt-3 first:pt-0 space-y-2 bg-amber-50/40 p-3 rounded-xl border border-amber-100';
+                row.innerHTML = `
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-1.5 flex-1">
+                            <input type="text" value="${detail.time}" onchange="updateItem(${index}, 'time', this.value)" class="w-24 bg-white px-2 py-1 text-[11px] font-black text-amber-900 border border-amber-300 rounded-md shadow-2xs">
+                            <input type="text" value="${detail.title}" onchange="updateItem(${index}, 'title', this.value)" class="flex-1 bg-white px-2 py-1 text-xs font-bold text-slate-800 border border-amber-300 rounded-md shadow-2xs">
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <button onclick="moveItem(${index}, -1)" class="w-6 h-6 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded text-xs font-bold" title="往上移">⬆️</button>
+                            <button onclick="moveItem(${index}, 1)" class="w-6 h-6 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded text-xs font-bold" title="往下移">⬇️</button>
+                            <button onclick="deleteItem(${index})" class="w-6 h-6 bg-red-100 hover:bg-red-200 text-red-600 rounded text-xs font-bold" title="刪除">🗑️</button>
+                        </div>
+                    </div>
+                    <textarea onchange="updateItem(${index}, 'desc', this.value)" rows="2" class="w-full bg-white px-2.5 py-1.5 text-xs text-slate-600 border border-amber-300 rounded-md shadow-2xs">${detail.desc}</textarea>
+                `;
+                bodyEl.appendChild(row);
+            });
+        }
+
+        // 更新項目內容
+        function updateItem(index, field, value) {
+            const data = tripData.find(d => d.day === currentEditingDay);
+            if(data && data.details[index]) {
+                data.details[index][field] = value;
+                saveData();
+            }
+        }
+
+        // 上下移動項目
+        function moveItem(index, direction) {
+            const data = tripData.find(d => d.day === currentEditingDay);
+            if(!data) return;
+            const newIndex = index + direction;
+            if(newIndex < 0 || newIndex >= data.details.length) return;
+            
+            const temp = data.details[index];
+            data.details[index] = data.details[newIndex];
+            data.details[newIndex] = temp;
+            
+            saveData();
+            renderModalBody(data);
+        }
+
+        // 刪除項目
+        function deleteItem(index) {
+            const data = tripData.find(d => d.day === currentEditingDay);
+            if(!data) return;
+            data.details.splice(index, 1);
+            saveData();
+            renderModalBody(data);
+        }
+
+        // 開啟新增視窗
+        function openAddItemModal() {
+            document.getElementById('new-time').value = '';
+            document.getElementById('new-title').value = '';
+            document.getElementById('new-desc').value = '';
+            document.getElementById('add-item-modal').classList.remove('hidden');
+        }
+
+        function closeAddItemModal() {
+            document.getElementById('add-item-modal').classList.add('hidden');
+        }
+
+        // 確認新增項目
+        function confirmAddItem() {
+            const time = document.getElementById('new-time').value.trim() || "全天";
+            const title = document.getElementById('new-title').value.trim() || "新行程項目";
+            const desc = document.getElementById('new-desc').value.trim() || "";
+
+            const data = tripData.find(d => d.day === currentEditingDay);
+            if(data) {
+                data.details.push({ time, title, desc });
+                saveData();
+                renderModalBody(data);
+            }
+            closeAddItemModal();
+        }
+
+        // 儲存至 LocalStorage
+        function saveData() {
+            localStorage.setItem('my_trip_data', JSON.stringify(tripData));
+            renderItinerary(document.querySelector('.filter-btn.bg-gradient-to-r') ? 'all' : 'all');
         }
 
         // 關閉 Modal
