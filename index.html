@@ -14,7 +14,7 @@
             color: #1e293b;
         }
         .sun-card {
-            background: rgba(255, 255, 255, 0.90);
+            background: rgba(255, 255, 255, 0.92);
             backdrop-filter: blur(16px);
             border: 1px solid rgba(251, 191, 36, 0.35);
             box-shadow: 0 12px 30px -10px rgba(245, 158, 11, 0.15);
@@ -33,7 +33,7 @@
         }
     </style>
 </head>
-<body class="pb-20">
+<body class="pb-24">
 
     <!-- 頂部 Hero Banner -->
     <header class="relative overflow-hidden bg-gradient-to-r from-amber-500 via-orange-500 to-sky-500 text-white shadow-xl rounded-b-[2.5rem] pt-8 pb-10 px-4">
@@ -50,7 +50,7 @@
     </header>
 
     <!-- 置頂懸浮篩選導航列 (Sticky Navigation) -->
-    <nav class="sticky top-0 z-40 bg-white/85 backdrop-blur-md border-b border-amber-200/60 shadow-sm py-3 px-4 mb-4">
+    <nav class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-amber-200/60 shadow-sm py-3 px-4 mb-4">
         <div class="max-w-md mx-auto flex gap-2 overflow-x-auto no-scrollbar">
             <button onclick="filterDestination('all', this)" class="filter-btn flex-none px-4 py-2 rounded-full text-xs font-black bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md transition-all scale-105">全部 14天</button>
             <button onclick="filterDestination('sg', this)" class="filter-btn flex-none px-4 py-2 rounded-full text-xs font-bold bg-white text-slate-700 border border-amber-200 shadow-sm hover:bg-amber-50 transition-all">🇸🇬 新加坡 (D1)</button>
@@ -64,74 +64,77 @@
         <!-- 程式動態載入 -->
     </main>
 
-    <!-- 詳細行程彈出視窗 (Modal)連帶編輯功能 -->
+    <!-- 詳細行程彈出視窗 (Modal)連帶全新手機友善編輯區 -->
     <div id="detail-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all opacity-0">
-        <div class="bg-white w-full sm:max-w-lg max-h-[90vh] sm:rounded-3xl rounded-t-3xl shadow-2xl flex flex-col overflow-hidden transform translate-y-full sm:translate-y-0 transition-transform duration-300" id="modal-content-box">
+        <div class="bg-white w-full sm:max-w-lg max-h-[92vh] sm:rounded-3xl rounded-t-3xl shadow-2xl flex flex-col overflow-hidden transform translate-y-full sm:translate-y-0 transition-transform duration-300" id="modal-content-box">
             
             <!-- Modal 頂部 Header 附背景圖 -->
-            <div id="modal-header" class="relative p-6 text-white bg-cover bg-center flex-none overflow-hidden" style="height: 140px;">
+            <div id="modal-header" class="relative p-6 text-white bg-cover bg-center flex-none overflow-hidden" style="height: 130px;">
                 <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/40 to-transparent"></div>
                 <button onclick="closeModal()" class="absolute top-4 right-4 z-10 w-9 h-9 bg-black/40 hover:bg-black/60 rounded-full flex items-center justify-center text-white text-lg font-bold backdrop-blur-md transition-colors">
                     ✕
                 </button>
                 <div class="relative z-10">
-                    <span id="modal-day-badge" class="inline-block bg-amber-500/90 text-white text-xs font-black px-2.5 py-1 rounded-full mb-2 shadow-sm">DAY 1</span>
-                    <h2 id="modal-title" class="text-xl sm:text-2xl font-black leading-tight drop-shadow-md">行程標題</h2>
-                    <p id="modal-hotel" class="text-xs text-amber-200 font-semibold mt-1 drop-shadow">🏨 酒店資訊</p>
+                    <span id="modal-day-badge" class="inline-block bg-amber-500/90 text-white text-xs font-black px-2.5 py-1 rounded-full mb-1 shadow-sm">DAY 1</span>
+                    <h2 id="modal-title" class="text-lg sm:text-xl font-black leading-tight drop-shadow-md">行程標題</h2>
+                    <p id="modal-hotel" class="text-xs text-amber-200 font-semibold mt-0.5 drop-shadow">🏨 酒店資訊</p>
                 </div>
             </div>
 
-            <!-- Modal 內容列表 (可滾動及編輯) -->
-            <div id="modal-body" class="p-5 overflow-y-auto space-y-4 divide-y divide-orange-100 flex-1">
-                <!-- 動態注入可編輯的時間軸項目 -->
+            <!-- Modal 內容列表 (手機超易禁嘅卡片式編輯) -->
+            <div id="modal-body" class="p-4 overflow-y-auto space-y-3 flex-1 bg-slate-50">
+                <!-- 動態注入行程卡片 -->
             </div>
 
-            <!-- 新增行程按鈕區 -->
-            <div class="p-3 bg-amber-50 border-t border-amber-200 flex-none">
-                <button onclick="openAddItemModal()" class="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl shadow-sm text-xs transition-all flex items-center justify-center gap-1">
-                    ➕ 在此日新增行程項目
+            <!-- 底部功能按鈕區 (新增行程 + 還原預設) -->
+            <div class="p-3 bg-white border-t border-slate-200 flex gap-2 flex-none">
+                <button onclick="openAddItemModal()" class="flex-1 py-3 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold rounded-xl shadow-md text-xs transition-all flex items-center justify-center gap-1">
+                    ➕ 新增行程項目
+                </button>
+                <button onclick="resetDayData()" class="px-3 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl text-xs transition-all" title="還原此日預設行程">
+                    🔄 還原
                 </button>
             </div>
 
-            <!-- Modal 底部關閉按鈕 -->
-            <div class="p-4 bg-slate-50 border-t border-slate-100 flex-none text-center">
-                <button onclick="closeModal()" class="w-full py-3 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold rounded-2xl shadow-md transition-all text-sm">
-                    儲存並關閉檢視
+            <!-- 關閉按鈕 -->
+            <div class="p-3 bg-slate-100 border-t border-slate-200 flex-none text-center">
+                <button onclick="closeModal()" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-sm transition-all text-xs">
+                    完成並關閉
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- 新增行程小視窗 -->
+    <!-- 新增/修改行程項目彈窗 -->
     <div id="add-item-modal" class="fixed inset-0 z-65 bg-slate-900/50 backdrop-blur-xs hidden flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-sm rounded-2xl p-5 shadow-2xl space-y-3">
-            <h3 class="font-extrabold text-slate-800 text-base">新增行程細節</h3>
+            <h3 id="item-modal-title" class="font-extrabold text-slate-800 text-base">新增行程</h3>
             <div>
-                <label class="text-xs font-bold text-slate-600">時間 (例如: 14:30-15:30)</label>
-                <input type="text" id="new-time" class="w-full mt-1 px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500" placeholder="14:30-15:30">
+                <label class="text-xs font-bold text-slate-600">時間區段</label>
+                <input type="text" id="edit-time" class="w-full mt-1 px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold text-amber-800" placeholder="例如: 14:00-15:30">
             </div>
             <div>
-                <label class="text-xs font-bold text-slate-600">行程標題</label>
-                <input type="text" id="new-title" class="w-full mt-1 px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500" placeholder="例如：品嚐下午茶">
+                <label class="text-xs font-bold text-slate-600">景點 / 活動名稱</label>
+                <input type="text" id="edit-title" class="w-full mt-1 px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold" placeholder="例如：品嚐下午茶">
             </div>
             <div>
-                <label class="text-xs font-bold text-slate-600">詳細描述</label>
-                <textarea id="new-desc" class="w-full mt-1 px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500" rows="3" placeholder="輸入詳細內容..."></textarea>
+                <label class="text-xs font-bold text-slate-600">詳細內容描述</label>
+                <textarea id="edit-desc" class="w-full mt-1 px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500" rows="3" placeholder="輸入詳細介紹..."></textarea>
             </div>
             <div class="flex gap-2 pt-2">
-                <button onclick="closeAddItemModal()" class="flex-1 py-2 bg-slate-200 text-slate-700 text-xs font-bold rounded-xl">取消</button>
-                <button onclick="confirmAddItem()" class="flex-1 py-2 bg-amber-500 text-white text-xs font-bold rounded-xl shadow-md">確認新增</button>
+                <button onclick="closeItemModal()" class="flex-1 py-2 bg-slate-200 text-slate-700 text-xs font-bold rounded-xl">取消</button>
+                <button onclick="saveItemModal()" class="flex-1 py-2 bg-amber-500 text-white text-xs font-bold rounded-xl shadow-md">儲存</button>
             </div>
         </div>
     </div>
 
     <script>
-        // 初始完整資料庫（支援 LocalStorage 讀取修改）
+        // 初始完整資料庫
         const defaultTripData = [
             {
                 day: 1, date: "10月31日", region: "sg", title: "新加坡「午餐雞飯×歷史街區×超級樹燈光秀」", hotel: "MERCURE ICON SINGAPORE",
                 image: "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=800&q=80",
-                summary: "抵達新加坡樟宜機場，直奔牛車水放行李，品嚐天天海南雞飯，午後聖淘沙 Skyline Luge 滑車，晚上魚尾獅公園與濱海灣花園超級樹燈光秀。",
+                summary: "抵達新加坡樟宜機場，直奔牛車水放行李，品嚐天天海南雞飯[cite: 2]，午後聖淘沙 Skyline Luge 滑車[cite: 2]，晚上魚尾獅公園與濱海灣花園超級樹燈光秀[cite: 2]。",
                 details: [
                     { time: "13:05-14:15", title: "抵達新加坡與快速通關", desc: "飛機降落樟宜機場。通過自動通關、拿完行李後，建議直接搭乘 Grab 直奔位於牛車水的飯店（車程約25分鐘）[cite: 1, 2]。" },
                     { time: "14:15-14:45", title: "飯店 Check-in & 放下行李", desc: "將行李寄放在飯店，換上初夏輕便服裝[cite: 2]。" },
@@ -145,7 +148,7 @@
             {
                 day: 2, date: "11月1日", region: "wa", title: "飛向西澳×古城週日集市×圓房落日", hotel: "ESPLANADE HOTEL FREMANTLE",
                 image: "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=800&q=80",
-                summary: "搭乘新航 SQ223 飛往珀斯，直奔弗里曼特爾，趕上百年週日市集，漫步圓房欣賞印度洋粉金落日。",
+                summary: "搭乘新航 SQ223 飛往珀斯[cite: 3]，直奔弗里曼特爾，趕上百年週日市集[cite: 3]，漫步圓房欣賞印度洋粉金落日[cite: 3]。",
                 details: [
                     { time: "09:30-14:40", title: "新航 SQ223 飛行時間", desc: "由新加坡樟宜機場出發飛往珀斯，飛行時間約5小時10分鐘[cite: 3]。" },
                     { time: "15:40-16:30", title: "機場接駁前往弗里曼特爾", desc: "建議直接使用 Uber 直奔 Fremantle（車程約40分鐘）[cite: 3]。" },
@@ -157,7 +160,7 @@
             {
                 day: 3, date: "11月2日", region: "wa", title: "登島單車環島×邂逅 Quokka 短尾矮袋鼠", hotel: "Stay Rottnest (小木屋)",
                 image: "https://images.unsplash.com/photo-1582967788606-a171c1080cb0?auto=format&fit=crop&w=800&q=80",
-                summary: "乘渡輪前往羅特尼斯島，租單車暢騎地中海泳池 The Basin 與粉紅湖，黃昏與萌爆的 Quokka 自拍。",
+                summary: "乘渡輪前往羅特尼斯島[cite: 4]，租單車暢騎地中海泳池 The Basin 與粉紅湖[cite: 4]，黃昏與萌爆的 Quokka 自拍[cite: 4]。",
                 details: [
                     { time: "08:30-09:00", title: "渡輪橫渡", desc: "搭乘渡輪前往羅特尼斯島，船程約30分鐘[cite: 4]。" },
                     { time: "09:45-12:30", title: "前半段單車環島（北部與中部）", desc: "騎單車造訪 The Basin 海濱泳池以及穿越島中央夢幻粉紅湖[cite: 4]。" },
@@ -167,7 +170,7 @@
             {
                 day: 4, date: "11月3日", region: "wa", title: "隱世海崖單車×渡假風午餐", hotel: "ESPLANADE HOTEL FREMANTLE",
                 image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
-                summary: "清晨無人沙灘散步，登燈塔看驚濤駭浪與野生海獅，午後品嚐柴燒披薩返回弗里曼特爾。",
+                summary: "清晨無人沙灘散步[cite: 5]，登燈塔看驚濤駭浪與野生海獅[cite: 5]，午後品嚐柴燒披薩返回弗里曼特爾[cite: 5]。",
                 details: [
                     { time: "09:30-11:30", title: "最西端壯麗探險", desc: "騎車上坡前往 Wadjemup Lighthouse 俯瞰全景，或到 Cape Vlamingh 看海獅[cite: 5]。" },
                     { time: "13:00-14:30", title: "渡假風悠閒午餐", desc: "在 Frankies on Rotto 享用柴燒手工薄皮披薩與肉醬義大利麵[cite: 5]。" }
@@ -176,7 +179,7 @@
             {
                 day: 5, date: "11月4日", region: "wa", title: "班伯利自駕飛行×棧橋日落", hotel: "BUSSELTON ITHACA MOTEL",
                 image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80",
-                summary: "展開自駕之旅，親自駕駛飛機飛上高空俯瞰海岸線，乘坐海上紅色小火車穿過巴瑟爾頓棧橋。",
+                summary: "展開自駕之旅，親自駕駛飛機飛上高空俯瞰海岸線[cite: 6]，乘坐海上紅色小火車穿過巴瑟爾頓棧橋[cite: 6]。",
                 details: [
                     { time: "13:00-14:30", title: "班伯利機場自駕飛行", desc: "親自掌控操縱桿飛上高空，俯瞰蔚藍海岸線 (Trial Instructional Flight)[cite: 6]。" },
                     { time: "15:15-18:30", title: "巴瑟爾頓棧橋與海底觀測站", desc: "乘搭紅色小火車穿越1.8公里木棧橋，深入水下8米觀賞海洋生物[cite: 6]。" }
@@ -184,8 +187,8 @@
             },
             {
                 day: 6, date: "11月5日", region: "wa", title: "隱世水療×黑沙灘×親手抱樹熊", hotel: "GREAT SOUTHERN HOTEL PERTH",
-                image: "https://images.unsplash.com/photo-1534567153574-2b12153a87f0?auto=format&fit=crop&w=800&q=80",
-                summary: "造訪天然岩池 Injidup Natural Spa，觀賞火山玄武岩黑沙灘，前往 Cohunu Koala Park 抱樹熊。",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSxwd4afnILYXAvDcdHsbGX_nKZH6_Z_ZwCJ8cnlxBNbQgMHqHGScMRYTyU&s=10",
+                summary: "造訪天然岩池 Injidup Natural Spa[cite: 7]，觀賞火山玄武岩黑沙灘[cite: 7]，前往 Cohunu Koala Park 抱樹熊[cite: 7]。",
                 details: [
                     { time: "09:00-11:00", title: "亞林加普 Injidup Natural Spa", desc: "在大自然按摩浴缸的天然岩池裡泡水拍照，享受海浪沖刷岩石的壯觀瀑布[cite: 7]。" },
                     { time: "15:15-16:40", title: "Cohunu Koala Park 抱樹熊", desc: "親手抱樹熊感受療癒感並合照，手餵袋鼠、鴯鶓[cite: 7]。" }
@@ -194,7 +197,7 @@
             {
                 day: 7, date: "11月6日", region: "wa", title: "尖峰石陣×朱里恩灣極限高空跳傘", hotel: "PELICAN'S NEST",
                 image: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=800&q=80",
-                summary: "探索南邦國家公園尖峰石陣，龍蝦工廠品嚐岩龍蝦，挑戰 15,000 呎高空跳傘。",
+                summary: "探索南邦國家公園尖峰石陣[cite: 8]，龍蝦工廠品嚐岩龍蝦[cite: 8]，挑戰 15,000 呎高空跳傘[cite: 8]。",
                 details: [
                     { time: "09:30-11:00", title: "參觀尖峰石陣 (The Pinnacles)", desc: "欣賞壯觀奇特的石灰岩柱群[cite: 8]。" },
                     { time: "13:30-15:30", title: "朱里恩灣極限高空跳傘", desc: "從 10,000 至 15,000 英尺高空一躍而下，極致刺激[cite: 8]。" }
@@ -203,7 +206,7 @@
             {
                 day: 8, date: "11月7日", region: "wa", title: "內陸峽谷天空步道×潟湖浮潛×紅崖日落", hotel: "PELICAN'S NEST",
                 image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=80",
-                summary: "懸空俯瞰卡爾巴里天空步道與大自然之窗，午後於 Blue Holes 天然潟湖浮潛。",
+                summary: "懸空俯瞰卡爾巴里天空步道與大自然之窗[cite: 9]，午後於 Blue Holes 天然潟湖浮潛[cite: 9]。",
                 details: [
                     { time: "08:00-11:30", title: "卡爾巴里國家公園內陸區", desc: "前往天空步道懸空俯瞰峽谷，在大自然之窗拍攝經典岩石畫框照[cite: 9]。" },
                     { time: "13:30-15:30", title: "Blue Holes 天然潟湖浮潛", desc: "海水清澈見底，在礁石縫隙中觀賞彩色珊瑚與熱帶魚[cite: 9]。" }
@@ -212,7 +215,7 @@
             {
                 day: 9, date: "11月8日", region: "wa", title: "夢幻芭比粉紅湖×蘭斯林白沙丘滑沙", hotel: "IBIS PERTH",
                 image: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?auto=format&fit=crop&w=800&q=80",
-                summary: "朝聖赫特潟湖夢幻粉紅湖，挑戰蘭斯林白沙丘滑沙，傍晚返回珀斯還車。",
+                summary: "朝聖赫特潟湖夢幻粉紅湖[cite: 10]，挑戰蘭斯林白沙丘滑沙[cite: 10]，傍晚返回珀斯還車[cite: 10]。",
                 details: [
                     { time: "08:45-09:45", title: "赫特潟湖 (Pink Lake)", desc: "陽光角度讓湖水呈現最飽滿夢幻的芭比粉紅色[cite: 10]。" },
                     { time: "15:30-16:30", title: "蘭斯林白沙丘滑沙", desc: "租借滑沙板爬上巨大純白沙丘俯衝而下[cite: 10]。" }
@@ -221,7 +224,7 @@
             {
                 day: 10, date: "11月9日", region: "wa", title: "伯斯市區精華免自駕一日遊", hotel: "IBIS PERTH",
                 image: "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=800&q=80",
-                summary: "乘搭綠貓公車遊覽國王公園、倫敦閣、伊麗莎白碼頭午餐、藍色船屋。",
+                summary: "乘搭綠貓公車遊覽國王公園、倫敦閣、伊麗莎白碼頭午餐、藍色船屋[cite: 11]。",
                 details: [
                     { time: "09:00-11:00", title: "國王公園 (Kings Park)", desc: "乘搭綠貓公車欣賞全景[cite: 11]。" },
                     { time: "14:30-15:45", title: "藍色船屋 (Blue Boat House)", desc: "打卡西澳極具代表性的網紅景點[cite: 11]。" }
@@ -230,7 +233,7 @@
             {
                 day: 11, date: "11月10日", region: "mel", title: "飛抵墨爾本·午後文藝漫步×亞拉河畔", hotel: "CAUSEWAY 353 HOTEL",
                 image: "https://images.unsplash.com/photo-1514395462725-fb4566210144?auto=format&fit=crop&w=800&q=80",
-                summary: "搭乘航班飛往墨爾本，入住市區後品嚐意式午餐，參觀 NGV 美術館，晚上亞拉河畔享用摩登澳洲菜。",
+                summary: "搭乘航班飛往墨爾本，入住市區後品嚐意式午餐，參觀 NGV 美術館，晚上亞拉河畔享用摩登澳洲菜[cite: 12]。",
                 details: [
                     { time: "06:00-11:35", title: "飛往墨爾本", desc: "乘搭 VA678 航班，航程約3.5小時[cite: 12]。" },
                     { time: "18:30", title: "亞拉河畔南岸晚餐", desc: "在南岸景觀餐廳享用摩登澳洲菜與紅酒[cite: 12]。" }
@@ -239,7 +242,7 @@
             {
                 day: 12, date: "11月11日", region: "mel", title: "丹頓農山脈百年蒸汽小火車之旅", hotel: "CAUSEWAY 353 HOTEL",
                 image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=800&q=80",
-                summary: "搭乘 Puffing Billy 蒸汽火車，雙腳盪在車窗外穿梭蕨類雨林，午後漫步霍西爾巷塗鴉牆。",
+                summary: "搭乘 Puffing Billy 蒸汽火車，雙腳盪在車窗外穿梭蕨類雨林，午後漫步霍西爾巷塗鴉牆[cite: 13]。",
                 details: [
                     { time: "11:00-12:00", title: "蒸汽小火車體驗", desc: "坐在火車窗框上，雙腳盪在外面，穿梭在經典高架橋與巨型蕨類樹林中[cite: 13]。" },
                     { time: "16:30-18:30", title: "市區探索", desc: "逛逛墨爾本著名的網紅塗鴉牆霍西爾巷[cite: 13]。" }
@@ -248,7 +251,7 @@
             {
                 day: 13, date: "11月12日", region: "mel", title: "QVM 美食早市×彩虹小屋×企鵝歸巢", hotel: "CAUSEWAY 353 HOTEL",
                 image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
-                summary: "女王市場品嚐甜甜圈與生蠔，布萊頓海灘彩色小屋打卡，傍晚前往菲利普島觀賞企鵝歸巢。",
+                summary: "女王市場品嚐甜甜圈與生蠔，布萊頓海灘彩色小屋打卡，傍晚前往菲利普島觀賞企鵝歸巢[cite: 14]。",
                 details: [
                     { time: "10:00-12:00", title: "維多利亞女王市場 (QVM) Brunch", desc: "掃街品嚐甜甜圈、拿鐵、土耳其餡餅與新鮮生蠔[cite: 14]。" },
                     { time: "19:30-21:15", title: "Penguin Plus 企鵝歸巢體驗", desc: "觀看成群結隊的小企鵝超近距離搖擺經過[cite: 14]。" }
@@ -257,7 +260,7 @@
             {
                 day: 14, date: "11月13日", region: "mel", title: "國泰商務艙奢華返港", hotel: "甜蜜溫馨的家",
                 image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=800&q=80",
-                summary: "享受墨爾本機場貴賓室，搭乘國泰航空 CX134 商務艙直飛香港，完美結束14天旅程。",
+                summary: "享受墨爾本機場貴賓室，搭乘國泰航空 CX134 商務艙直飛香港，完美結束14天旅程[cite: 1]。",
                 details: [
                     { time: "05:00", title: "前往機場與貴賓室早餐", desc: "進入國泰合作貴賓室享用現點現做澳式熱早餐[cite: 1]。" },
                     { time: "07:25", title: "搭乘國泰航空 CX134 商務艙返港", desc: "在萬呎高空享用商務艙多道菜式午餐與美酒降落香港[cite: 1]。" }
@@ -265,9 +268,9 @@
             }
         ];
 
-        // 讀取儲存或預設資料
         let tripData = JSON.parse(localStorage.getItem('my_trip_data')) || defaultTripData;
         let currentEditingDay = null;
+        let editingItemIndex = null;
 
         // 渲染主畫面列表
         function renderItinerary(filter = 'all') {
@@ -356,39 +359,33 @@
             document.body.style.overflow = 'hidden';
         }
 
-        // 渲染 Modal 內部可編輯項目
+        // 渲染 Modal 內部手機友善卡片
         function renderModalBody(data) {
             const bodyEl = document.getElementById('modal-body');
             bodyEl.innerHTML = '';
 
             data.details.forEach((detail, index) => {
-                const row = document.createElement('div');
-                row.className = 'pt-3 first:pt-0 space-y-2 bg-amber-50/40 p-3 rounded-xl border border-amber-100';
-                row.innerHTML = `
-                    <div class="flex items-center justify-between gap-2">
-                        <div class="flex items-center gap-1.5 flex-1">
-                            <input type="text" value="${detail.time}" onchange="updateItem(${index}, 'time', this.value)" class="w-24 bg-white px-2 py-1 text-[11px] font-black text-amber-900 border border-amber-300 rounded-md shadow-2xs">
-                            <input type="text" value="${detail.title}" onchange="updateItem(${index}, 'title', this.value)" class="flex-1 bg-white px-2 py-1 text-xs font-bold text-slate-800 border border-amber-300 rounded-md shadow-2xs">
-                        </div>
+                const card = document.createElement('div');
+                card.className = 'bg-white p-3.5 rounded-2xl border border-amber-200/80 shadow-xs space-y-2';
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span class="bg-amber-100 text-amber-900 text-[11px] font-black px-2.5 py-0.5 rounded-full">
+                            ⏱ ${detail.time}
+                        </span>
                         <div class="flex items-center gap-1">
-                            <button onclick="moveItem(${index}, -1)" class="w-6 h-6 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded text-xs font-bold" title="往上移">⬆️</button>
-                            <button onclick="moveItem(${index}, 1)" class="w-6 h-6 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded text-xs font-bold" title="往下移">⬇️</button>
-                            <button onclick="deleteItem(${index})" class="w-6 h-6 bg-red-100 hover:bg-red-200 text-red-600 rounded text-xs font-bold" title="刪除">🗑️</button>
+                            <button onclick="moveItem(${index}, -1)" class="w-7 h-7 bg-slate-100 hover:bg-amber-100 text-slate-700 rounded-lg text-xs font-bold shadow-2xs" title="上移">⬆️</button>
+                            <button onclick="moveItem(${index}, 1)" class="w-7 h-7 bg-slate-100 hover:bg-amber-100 text-slate-700 rounded-lg text-xs font-bold shadow-2xs" title="下移">⬇️</button>
+                            <button onclick="openEditItemModal(${index})" class="w-7 h-7 bg-orange-100 hover:bg-orange-200 text-orange-700 rounded-lg text-xs font-bold shadow-2xs" title="編輯">✏️</button>
+                            <button onclick="deleteItem(${index})" class="w-7 h-7 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg text-xs font-bold shadow-2xs" title="刪除">🗑️</button>
                         </div>
                     </div>
-                    <textarea onchange="updateItem(${index}, 'desc', this.value)" rows="2" class="w-full bg-white px-2.5 py-1.5 text-xs text-slate-600 border border-amber-300 rounded-md shadow-2xs">${detail.desc}</textarea>
+                    <div>
+                        <h4 class="text-xs sm:text-sm font-extrabold text-slate-800">${detail.title}</h4>
+                        <p class="text-xs text-slate-600 leading-relaxed mt-1">${detail.desc}</p>
+                    </div>
                 `;
-                bodyEl.appendChild(row);
+                bodyEl.appendChild(card);
             });
-        }
-
-        // 更新項目內容
-        function updateItem(index, field, value) {
-            const data = tripData.find(d => d.day === currentEditingDay);
-            if(data && data.details[index]) {
-                data.details[index][field] = value;
-                saveData();
-            }
         }
 
         // 上下移動項目
@@ -415,37 +412,69 @@
             renderModalBody(data);
         }
 
-        // 開啟新增視窗
+        // 開啟新增項目彈窗
         function openAddItemModal() {
-            document.getElementById('new-time').value = '';
-            document.getElementById('new-title').value = '';
-            document.getElementById('new-desc').value = '';
+            editingItemIndex = null;
+            document.getElementById('item-modal-title').innerText = "新增行程項目";
+            document.getElementById('edit-time').value = "10:00-11:00";
+            document.getElementById('edit-title').value = "";
+            document.getElementById('edit-desc').value = "";
             document.getElementById('add-item-modal').classList.remove('hidden');
         }
 
-        function closeAddItemModal() {
+        // 開啟編輯現有項目彈窗
+        function openEditItemModal(index) {
+            editingItemIndex = index;
+            const data = tripData.find(d => d.day === currentEditingDay);
+            const item = data.details[index];
+            
+            document.getElementById('item-modal-title').innerText = "編輯行程項目";
+            document.getElementById('edit-time').value = item.time;
+            document.getElementById('edit-title').value = item.title;
+            document.getElementById('edit-desc').value = item.desc;
+            document.getElementById('add-item-modal').classList.remove('hidden');
+        }
+
+        function closeItemModal() {
             document.getElementById('add-item-modal').classList.add('hidden');
         }
 
-        // 確認新增項目
-        function confirmAddItem() {
-            const time = document.getElementById('new-time').value.trim() || "全天";
-            const title = document.getElementById('new-title').value.trim() || "新行程項目";
-            const desc = document.getElementById('new-desc').value.trim() || "";
+        // 儲存項目 (新增或修改)
+        function saveItemModal() {
+            const time = document.getElementById('edit-time').value.trim() || "全天";
+            const title = document.getElementById('edit-title').value.trim() || "未命名行程";
+            const desc = document.getElementById('edit-desc').value.trim() || "";
 
             const data = tripData.find(d => d.day === currentEditingDay);
             if(data) {
-                data.details.push({ time, title, desc });
+                if(editingItemIndex === null) {
+                    data.details.push({ time, title, desc });
+                } else {
+                    data.details[editingItemIndex] = { time, title, desc };
+                }
                 saveData();
                 renderModalBody(data);
             }
-            closeAddItemModal();
+            closeItemModal();
+        }
+
+        // 還原當日預設
+        function resetDayData() {
+            if(confirm("確定要將這一日的行程還原為最初預設嗎？")) {
+                const def = defaultTripData.find(d => d.day === currentEditingDay);
+                const current = tripData.find(d => d.day === currentEditingDay);
+                if(def && current) {
+                    current.details = JSON.parse(JSON.stringify(def.details));
+                    saveData();
+                    renderModalBody(current);
+                }
+            }
         }
 
         // 儲存至 LocalStorage
         function saveData() {
             localStorage.setItem('my_trip_data', JSON.stringify(tripData));
-            renderItinerary(document.querySelector('.filter-btn.bg-gradient-to-r') ? 'all' : 'all');
+            renderItinerary('all');
         }
 
         // 關閉 Modal
