@@ -109,8 +109,8 @@
         <div class="bg-white w-full max-w-sm rounded-2xl p-5 shadow-2xl space-y-3">
             <h3 id="item-modal-title" class="font-extrabold text-slate-800 text-base">新增行程</h3>
             <div>
-                <label class="text-xs font-bold text-slate-600">時間區段 (例如: 14:00-15:30)</label>
-                <input type="text" id="edit-time" class="w-full mt-1 px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold text-amber-800" placeholder="例如: 14:00-15:30">
+                <label class="text-xs font-bold text-slate-600">時間區段 (可直接輸入 0900 或 09:00-1430)</label>
+                <input type="text" id="edit-time" class="w-full mt-1 px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold text-amber-800" placeholder="例如: 0900-1130 或 09:00">
             </div>
             <div>
                 <label class="text-xs font-bold text-slate-600">景點 / 活動名稱</label>
@@ -186,7 +186,7 @@
             },
             {
                 day: 6, date: "11月5日", region: "wa", title: "隱世水療×黑沙灘×親手抱樹熊", hotel: "GREAT SOUTHERN HOTEL PERTH",
-                image: "https://img.myshopline.com/image/store/1756376570606/IMG-47502.heic?w=2717&h=2717",
+                image: "https://img.myshopline.com/image/store/1756376570606/IMG-4768_1800x.heic?w=2426&h=2426&q=80",
                 summary: "造訪天然岩池 Injidup Natural Spa[cite: 7]，觀賞火山玄武岩黑沙灘[cite: 7]，前往 Cohunu Koala Park 抱樹熊[cite: 7]。",
                 details: [
                     { time: "09:00-11:00", title: "亞林加普 Injidup Natural Spa", desc: "在大自然按摩浴缸的天然岩池裡泡水拍照，享受海浪沖刷岩石的壯觀瀑布[cite: 7]。" },
@@ -262,7 +262,7 @@
                 summary: "享受墨爾本機場貴賓室，搭乘國泰航空 CX134 商務艙直飛香港，完美結束14天旅程[cite: 1]。",
                 details: [
                     { time: "05:00", title: "前往機場與貴賓室早餐", desc: "進入國泰合作貴賓室享用現點現做澳式熱早餐[cite: 1]。" },
-                    { time: "07:25", title: "搭乘國泰航空 CX134 商務艙返港", desc: "在萬呎高空享用商務艙多道菜式午餐與美酒降落香港[cite: 1]。" }
+                    { time: "07:25", title: "搭乘國泰航空 CX134 商務艙直飛香港", desc: "在萬呎高空享用商務艙多道菜式午餐與美酒降落香港[cite: 1]。" }
                 ]
             }
         ];
@@ -346,9 +346,7 @@
             const headerEl = document.getElementById('modal-header');
             headerEl.style.backgroundImage = `url('${data.image}')`;
 
-            // 開啟時先自動按時間排序一次
             sortDetailsByTime(data);
-
             renderModalBody(data);
 
             const modal = document.getElementById('detail-modal');
@@ -361,13 +359,27 @@
             document.body.style.overflow = 'hidden';
         }
 
+        // 智慧時間格式化工具：把 "0900" 轉成 "09:00"，"0900-1430" 轉成 "09:00-14:30"
+        function smartFormatTime(inputStr) {
+            if(!inputStr) return "全天";
+            // 尋找字串中的數字組合進行轉換
+            return inputStr.replace(/\b(\d{1,2})(\d{2})\b/g, (match, h, m) => {
+                return h.padStart(2, '0') + ':' + m;
+            });
+        }
+
         // 核心功能：依據時間自動排序 details 陣列
         function sortDetailsByTime(data) {
             data.details.sort((a, b) => {
-                // 提取時間字串中第一個出現的四位數時間（例如 "13:05-14:15" 提取出 "13:05"）
                 const getTimeVal = (str) => {
-                    const match = str.match(/\d{2}:\d{2}/);
-                    return match ? match[0] : "99:99"; // 沒有時間的排到最後
+                    const match = str.match(/\d{2}:\d{2}|\b\d{3,4}\b/);
+                    if (!match) return "99:99";
+                    let t = match[0];
+                    if(t.length === 3 || t.length === 4) {
+                        t = t.padStart(4, '0');
+                        t = t.slice(0,2) + ':' + t.slice(2);
+                    }
+                    return t;
                 };
                 return getTimeVal(a.time).localeCompare(getTimeVal(b.time));
             });
@@ -413,6 +425,7 @@
             data.details[index] = data.details[newIndex];
             data.details[newIndex] = temp;
             
+            sortDetailsByTime(data); // 排序
             saveData();
             renderModalBody(data);
         }
@@ -430,7 +443,7 @@
         function openAddItemModal() {
             editingItemIndex = null;
             document.getElementById('item-modal-title').innerText = "新增行程項目";
-            document.getElementById('edit-time').value = "10:00-11:00";
+            document.getElementById('edit-time').value = "1000-1100";
             document.getElementById('edit-title').value = "";
             document.getElementById('edit-desc').value = "";
             document.getElementById('add-item-modal').classList.remove('hidden');
@@ -453,9 +466,10 @@
             document.getElementById('add-item-modal').classList.add('hidden');
         }
 
-        // 儲存項目 (新增或修改) -> 自動重新按時間排序！
+        // 儲存項目 (自動轉化 0900 -> 09:00 並自動重新按時間排序)
         function saveItemModal() {
-            const time = document.getElementById('edit-time').value.trim() || "全天";
+            let rawTime = document.getElementById('edit-time').value.trim() || "全天";
+            const time = smartFormatTime(rawTime); // 自動轉格式
             const title = document.getElementById('edit-title').value.trim() || "未命名行程";
             const desc = document.getElementById('edit-desc').value.trim() || "";
 
@@ -467,9 +481,7 @@
                     data.details[editingItemIndex] = { time, title, desc };
                 }
                 
-                // 每次新增或修改後，自動按時間排序！
-                sortDetailsByTime(data);
-
+                sortDetailsByTime(data); // 自動排序
                 saveData();
                 renderModalBody(data);
             }
