@@ -24,7 +24,6 @@
             transform: translateY(-3px);
             box-shadow: 0 20px 35px -10px rgba(245, 158, 11, 0.25);
         }
-        /* 自訂隱藏捲軸但保持順暢 */
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
@@ -53,10 +52,10 @@
     <!-- 置頂懸浮篩選導航列 (Sticky Navigation) -->
     <nav class="sticky top-0 z-40 bg-white/85 backdrop-blur-md border-b border-amber-200/60 shadow-sm py-3 px-4 mb-4">
         <div class="max-w-md mx-auto flex gap-2 overflow-x-auto no-scrollbar">
-            <button onclick="filterDestination('all', this)" class="filter-btn flex-none px-4 py-2 rounded-full text-xs font-black bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md transition-all scale-105">全部 14 天</button>
+            <button onclick="filterDestination('all', this)" class="filter-btn flex-none px-4 py-2 rounded-full text-xs font-black bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md transition-all scale-105">全部 14天</button>
             <button onclick="filterDestination('sg', this)" class="filter-btn flex-none px-4 py-2 rounded-full text-xs font-bold bg-white text-slate-700 border border-amber-200 shadow-sm hover:bg-amber-50 transition-all">🇸🇬 新加坡 (D1)</button>
-            <button onclick="filterDestination('wa', this)" class="filter-btn flex-none px-4 py-2 rounded-full text-xs font-bold bg-white text-slate-700 border border-amber-200 shadow-sm hover:bg-amber-50 transition-all">🇦🇺 西澳 (D2-D10)</button>
-            <button onclick="filterDestination('mel', this)" class="filter-btn flex-none px-4 py-2 rounded-full text-xs font-bold bg-white text-slate-700 border border-amber-200 shadow-sm hover:bg-amber-50 transition-all">🇦🇺 墨爾本 (D11-D14)</button>
+            <button onclick="filterDestination('wa', this)" class="filter-btn flex-none px-4 py-2 rounded-full text-xs font-bold bg-white text-slate-700 border border-amber-200 shadow-sm hover:bg-amber-50 transition-all">🇦🇺 西澳 (D2-10)</button>
+            <button onclick="filterDestination('mel', this)" class="filter-btn flex-none px-4 py-2 rounded-full text-xs font-bold bg-white text-slate-700 border border-amber-200 shadow-sm hover:bg-amber-50 transition-all">🇦🇺 墨爾本 (D11-14)</button>
         </div>
     </nav>
 
@@ -70,7 +69,7 @@
         <div class="bg-white w-full sm:max-w-lg max-h-[90vh] sm:rounded-3xl rounded-t-3xl shadow-2xl flex flex-col overflow-hidden transform translate-y-full sm:translate-y-0 transition-transform duration-300" id="modal-content-box">
             
             <!-- Modal 頂部 Header 附背景圖 -->
-            <div id="modal-header" class="relative p-6 text-white bg-cover bg-center flex-none overflow-hidden">
+            <div id="modal-header" class="relative p-6 text-white bg-cover bg-center flex-none overflow-hidden" style="height: 140px;">
                 <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/40 to-transparent"></div>
                 <button onclick="closeModal()" class="absolute top-4 right-4 z-10 w-9 h-9 bg-black/40 hover:bg-black/60 rounded-full flex items-center justify-center text-white text-lg font-bold backdrop-blur-md transition-colors">
                     ✕
@@ -97,7 +96,7 @@
     </div>
 
     <script>
-        // 行程完整資料庫連帶高畫質風景圖片
+        // 行程完整資料庫連帶優質穩定圖片
         const tripData = [
             {
                 day: 1, date: "10月31日", region: "sg", title: "新加坡「午餐雞飯×歷史街區×超級樹燈光秀」", hotel: "MERCURE ICON SINGAPORE",
@@ -127,7 +126,7 @@
             },
             {
                 day: 3, date: "11月2日", region: "wa", title: "登島單車環島×邂逅 Quokka 短尾矮袋鼠", hotel: "Stay Rottnest (小木屋)",
-                image: "https://images.unsplash.com/photo-1529367071555-d3e26cb3b9a0?auto=format&fit=crop&w=800&q=80",
+                image: "https://images.unsplash.com/photo-1582967788606-a171c1080cb0?auto=format&fit=crop&w=800&q=80",
                 summary: "乘渡輪前往羅特尼斯島，租單車暢騎地中海泳池 The Basin 與粉紅湖，黃昏與萌爆的 Quokka 自拍。",
                 details: [
                     { time: "08:30-09:00", title: "渡輪橫渡", desc: "搭乘渡輪前往羅特尼斯島，船程約30分鐘[cite: 4]。" },
@@ -253,8 +252,8 @@
                 card.className = 'sun-card rounded-2xl overflow-hidden cursor-pointer';
                 card.onclick = () => openModal(item.day);
                 card.innerHTML = `
-                    <div class="relative h-36 w-full overflow-hidden">
-                        <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
+                    <div class="relative h-36 w-full overflow-hidden bg-slate-200">
+                        <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" loading="lazy">
                         <div class="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-transparent to-transparent"></div>
                         <div class="absolute top-3 left-3 flex gap-2">
                             <span class="bg-gradient-to-r from-orange-500 to-amber-500 text-white text-xs font-black px-3 py-1 rounded-full shadow-md">
@@ -278,7 +277,7 @@
                         </p>
                         <div class="flex items-center justify-between pt-2 border-t border-amber-100 text-xs">
                             <span class="text-slate-600 font-semibold truncate max-w-[210px]">🏨 ${item.hotel}</span>
-                            <span class="text-orange-600 font-bold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                            <span class="text-orange-600 font-bold flex items-center gap-1">
                                 查看詳細行程 →
                             </span>
                         </div>
@@ -307,10 +306,8 @@
             document.getElementById('modal-title').innerText = data.title;
             document.getElementById('modal-hotel').innerText = `🏨 今日住宿：${data.hotel}`;
             
-            // 設定 Modal Header 背景圖片
             const headerEl = document.getElementById('modal-header');
             headerEl.style.backgroundImage = `url('${data.image}')`;
-            headerEl.style.height = '140px';
 
             const bodyEl = document.getElementById('modal-body');
             bodyEl.innerHTML = '';
